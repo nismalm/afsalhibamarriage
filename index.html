@@ -549,7 +549,7 @@
   <div class="const" data-shape="heart" title="one heart"></div>
 
   <!-- ═══ CHAPTER V ═══ -->
-  <section class="chapter">
+  <!-- <section class="chapter">
     <div class="frame-col rise">
       <div class="floaty">
         <div class="star-frame" data-tilt>
@@ -568,7 +568,7 @@
       <h2>The best friend who had dibs first</h2>
       <p>Long before the rings, this one had already put in twelve years of practice. Through every job change, every rough patch, every dumb idea we somehow talked ourselves into, food was never really the point, it was just the easiest excuse to sit down and say the real things. <em>Twelve years in, and Afsal's still the one he calls first, right after Murshi.</em></p>
     </div>
-  </section>
+  </section> -->
 
   <!-- ═══ GROUP PHOTO ═══ -->
   <section class="converge">
@@ -601,13 +601,9 @@
     <p class="serif rise d2" style="font-style:italic;color:var(--muted);margin-top:12px;">Three years old. One very important message. Zero rehearsals that went as planned.</p>
 
     <div class="screen-shell rise d2" id="screenShell">
-      <video id="wishVideo" playsinline preload="metadata">
-        <source src="video/wish.mp4" type="video/mp4">
+      <video id="wishVideo" playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none;">
+        <source src="https://pub-03af4e367bd6462cb2eea6e83e913a7c.r2.dev/AH_EMY_WISH_web.mp4" type="video/mp4">
       </video>
-      <div class="reserved" id="reserved" hidden>
-        <div class="tw">✦</div>
-        <p>Her message is being kept safe until the big day. Consider this seat reserved.</p>
-      </div>
       <div class="curtain L"></div>
       <div class="curtain R"></div>
       <div class="curtain-cta" id="curtainCta">
@@ -1086,25 +1082,16 @@
   }
   tickCount(); setInterval(tickCount, 1000);
 
-  /* ── cinema curtains + graceful missing-video fallback ── */
+  /* ── cinema curtains ── */
   var shell = document.getElementById('screenShell');
   var video = document.getElementById('wishVideo');
-  var reserved = document.getElementById('reserved');
-  function showReserved(){
-    reserved.hidden = false;
-    video.style.display = 'none';
-  }
-  var src = video.querySelector('source');
-  if(src) src.addEventListener('error', showReserved);
-  video.addEventListener('error', showReserved);
   document.getElementById('curtainCta').addEventListener('click', function(){
     shell.classList.add('open');
     var r = shell.getBoundingClientRect();
     spark(r.left+r.width*0.5, r.top+20, 30, 3.6, 0.05);
     setTimeout(function(){
-      if(reserved.hidden && video.play){
-        video.play().catch(showReserved);
-      }
+      video.style.display = 'block';
+      video.play();
     }, 1200);
   });
 
