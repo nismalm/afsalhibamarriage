@@ -601,9 +601,10 @@
     <p class="serif rise d2" style="font-style:italic;color:var(--muted);margin-top:12px;">Three years old. One very important message. Zero rehearsals that went as planned.</p>
 
     <div class="screen-shell rise d2" id="screenShell">
-      <video id="wishVideo" playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none;">
-        <source src="https://pub-03af4e367bd6462cb2eea6e83e913a7c.r2.dev/AH_EMY_WISH_web.mp4" type="video/mp4">
+      <video id="wishVideo" playsinline webkit-playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none;">
+        <source src="video/AH_EMY_WISH_web.mp4" type="video/mp4">
       </video>
+      <button id="replayBtn" hidden style="position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(0,0,0,.55);border:1px solid rgba(217,179,106,.6);color:var(--gold);font-family:'Sora',sans-serif;font-size:12px;letter-spacing:.2em;padding:8px 20px;cursor:pointer;border-radius:40px;">&#9654; replay</button>
       <div class="curtain L"></div>
       <div class="curtain R"></div>
       <div class="curtain-cta" id="curtainCta">
@@ -1085,6 +1086,7 @@
   /* ── cinema curtains ── */
   var shell = document.getElementById('screenShell');
   var video = document.getElementById('wishVideo');
+  var replayBtn = document.getElementById('replayBtn');
   document.getElementById('curtainCta').addEventListener('click', function(){
     shell.classList.add('open');
     var r = shell.getBoundingClientRect();
@@ -1093,6 +1095,14 @@
       video.style.display = 'block';
       video.play();
     }, 1200);
+  });
+  video.addEventListener('ended', function(){
+    replayBtn.hidden = false;
+  });
+  replayBtn.addEventListener('click', function(){
+    replayBtn.hidden = true;
+    video.currentTime = 0;
+    video.play();
   });
 
   /* ── lanterns + fireworks ── */
