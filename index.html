@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Hiba &amp; Afsal — Written in the Stars</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night:#0A1020;
+    --night2:#101A33;
+    --gold:#D9B36A;
+    --gold-bright:#F3DCA4;
+    --champagne:#EFE3C8;
+    --ivory:#F7F2E7;
+    --muted:#8E97AD;
+    --ease:cubic-bezier(.22,.75,.25,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:radial-gradient(ellipse 120% 80% at 50% -10%, var(--night2), var(--night) 60%);
+    color:var(--ivory);
+    font-family:'Sora',sans-serif;
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+  ::selection{background:var(--gold);color:var(--night);}
+
+  canvas#stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+  canvas#fx{position:fixed;inset:0;z-index:40;pointer-events:none;}
+
+  .serif{font-family:'Cormorant Garamond',serif;}
+  .caps{font-family:'Sora',sans-serif;font-weight:600;letter-spacing:.34em;text-transform:uppercase;font-size:11px;color:var(--gold);}
+
+  /* ═══════════ ENVELOPE INTRO ═══════════ */
+  #veil{
+    position:fixed;inset:0;z-index:100;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:34px;
+    background:radial-gradient(ellipse 120% 90% at 50% 0%, #131E3C, #070C18 65%);
+    transition:opacity 1.1s ease, visibility 1.1s;
+  }
+  #veil.gone{opacity:0;visibility:hidden;}
+  .veil-caps{opacity:0;animation:vFade 1.2s ease .3s forwards;}
+  @keyframes vFade{to{opacity:1;}}
+
+  .envelope{
+    position:relative;width:min(320px,80vw);aspect-ratio:1.45;
+    cursor:pointer;
+    opacity:0;transform:translateY(26px);
+    animation:vRise 1.1s var(--ease) .55s forwards;
+    filter:drop-shadow(0 30px 60px rgba(0,0,0,.6));
+  }
+  @keyframes vRise{to{opacity:1;transform:translateY(0);}}
+  .env-body{
+    position:absolute;inset:0;border-radius:6px;
+    background:linear-gradient(160deg,#182647,#0F1830);
+    border:1px solid rgba(217,179,106,.45);
+    overflow:hidden;
+  }
+  .env-body::before,.env-body::after{
+    content:'';position:absolute;inset:0;
+  }
+  .env-body::before{ /* lower V folds */
+    background:
+      linear-gradient(63deg, rgba(217,179,106,.16) 0 1.5px, transparent 1.5px) left bottom/52% 100% no-repeat,
+      linear-gradient(-63deg, rgba(217,179,106,.16) 0 1.5px, transparent 1.5px) right bottom/52% 100% no-repeat;
+  }
+  .env-flap{
+    position:absolute;left:0;right:0;top:0;height:56%;
+    background:linear-gradient(180deg,#22335E,#15224400);
+    clip-path:polygon(0 0, 100% 0, 50% 100%);
+    border-top:1px solid rgba(217,179,106,.5);
+    transform-origin:top center;
+    transition:transform .9s var(--ease);
+    z-index:2;
+  }
+  .envelope.open .env-flap{transform:rotateX(168deg);}
+  .env-letter{
+    position:absolute;left:7%;right:7%;top:9%;bottom:12%;
+    background:linear-gradient(180deg,var(--ivory),#E7DCC2);
+    border-radius:3px;z-index:1;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform 1s var(--ease) .35s;
+    color:#5B4A2C;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;
+  }
+  .envelope.open .env-letter{transform:translateY(-34%);}
+  .seal{
+    position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+    width:88px;height:88px;border-radius:50%;z-index:3;
+    background:radial-gradient(circle at 35% 30%, #E8C377, #A97B2F 58%, #7C561B);
+    box-shadow:0 8px 22px rgba(0,0,0,.55), inset 0 2px 6px rgba(255,255,255,.35), inset 0 -4px 8px rgba(0,0,0,.3);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Italiana',serif;font-size:30px;color:#3C2A0C;
+    transition:transform .5s var(--ease), opacity .5s ease;
+    animation:sealPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes sealPulse{0%,100%{box-shadow:0 8px 22px rgba(0,0,0,.55), 0 0 0 0 rgba(217,179,106,.35), inset 0 2px 6px rgba(255,255,255,.35);}50%{box-shadow:0 8px 22px rgba(0,0,0,.55), 0 0 0 18px rgba(217,179,106,0), inset 0 2px 6px rgba(255,255,255,.35);}}
+  .envelope.open .seal{transform:translate(-50%,-50%) scale(1.6) rotate(18deg);opacity:0;}
+  .veil-hint{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);opacity:0;animation:vFade 1.2s ease 1.4s forwards;}
+
+  /* ═══════════ STORY SHELL ═══════════ */
+  #story{position:relative;z-index:1;}
+  #threadSvg{position:absolute;top:0;left:0;width:100%;pointer-events:none;z-index:1;}
+  #threadSvg path{fill:none;stroke:url(#goldGrad);stroke-width:1.6;opacity:.85;
+    filter:drop-shadow(0 0 6px rgba(217,179,106,.45));}
+
+  section{position:relative;z-index:2;padding:15vh 24px;max-width:1060px;margin:0 auto;}
+
+  .rise{opacity:0;transform:translateY(46px);transition:opacity 1s ease, transform 1s var(--ease);}
+  .rise.in{opacity:1;transform:none;}
+  .rise.d1{transition-delay:.12s;}
+  .rise.d2{transition-delay:.26s;}
+  .rise.d3{transition-delay:.4s;}
+
+  /* ═══════════ HERO ═══════════ */
+  .hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:26px;}
+  .hero .caps{opacity:0;}
+  .hero.begin .caps{animation:vFade 1s ease .2s forwards;}
+  .hero h1{
+    font-family:'Italiana',serif;font-weight:400;
+    font-size:clamp(58px,13vw,150px);line-height:.98;
+    background:linear-gradient(100deg,var(--gold) 20%,var(--gold-bright) 40%,#FFF6DF 50%,var(--gold-bright) 60%,var(--gold) 80%);
+    background-size:220% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:sheen 7s linear infinite;
+    opacity:0;transform:scale(.96);
+    transition:opacity 1.4s ease .35s, transform 1.4s var(--ease) .35s;
+  }
+  .hero.begin h1{opacity:1;transform:none;}
+  @keyframes sheen{to{background-position:-220% 0;}}
+  .hero .and{display:block;font-size:.32em;letter-spacing:.5em;margin:14px 0 10px;color:var(--champagne);-webkit-text-fill-color:var(--champagne);}
+  .hero .sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(18px,2.6vw,24px);color:var(--muted);max-width:460px;opacity:0;transition:opacity 1.2s ease 1s;}
+  .hero.begin .sub{opacity:1;}
+  .hero .down{margin-top:5vh;width:1px;height:64px;background:linear-gradient(var(--gold),transparent);opacity:0;transition:opacity 1s ease 1.6s;position:relative;}
+  .hero.begin .down{opacity:1;}
+  .hero .down::before{content:'';position:absolute;top:0;left:-2px;width:5px;height:5px;border-radius:50%;background:var(--gold-bright);animation:drip 2.2s ease-in-out infinite;}
+  @keyframes drip{0%{top:0;opacity:1;}80%{top:58px;opacity:0;}100%{top:0;opacity:0;}}
+
+  /* ═══════════ CHAPTERS ═══════════ */
+  .chapter{display:grid;grid-template-columns:1fr 1fr;gap:8vw;align-items:center;}
+  .chapter.flip .frame-col{order:2;}
+  @media(max-width:760px){.chapter{grid-template-columns:1fr;gap:52px;}.chapter.flip .frame-col{order:0;}}
+  .ch-num{font-family:'Italiana',serif;font-size:15px;letter-spacing:.44em;color:var(--gold);margin-bottom:16px;}
+  .chapter h2{font-family:'Italiana',serif;font-weight:400;font-size:clamp(34px,5vw,56px);line-height:1.08;margin-bottom:20px;}
+  .chapter p{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.2vw,21px);line-height:1.75;color:#C4CBDA;}
+  .chapter p em{color:var(--gold-bright);}
+
+  .frame-col{display:flex;justify-content:center;perspective:1100px;}
+  .star-frame{
+    position:relative;width:min(310px,74vw);
+    transition:transform .18s linear;
+    will-change:transform;
+  }
+  .star-frame .mat{
+    position:relative;padding:12px;border-radius:2px;
+    background:linear-gradient(150deg,#1A2647,#101A33);
+    border:1px solid rgba(217,179,106,.55);
+    box-shadow:0 34px 70px rgba(0,0,0,.55), inset 0 0 0 1px rgba(0,0,0,.4);
+  }
+  .star-frame .mat::before{
+    content:'';position:absolute;inset:6px;border:1px solid rgba(217,179,106,.35);pointer-events:none;z-index:2;
+  }
+  .star-frame img{width:100%;display:block;aspect-ratio:.86;object-fit:cover;filter:saturate(1.04) contrast(1.02);}
+  .star-frame .corner{position:absolute;width:22px;height:22px;border-color:var(--gold);border-style:solid;z-index:3;}
+  .star-frame .corner.tl{top:-7px;left:-7px;border-width:1.5px 0 0 1.5px;}
+  .star-frame .corner.tr{top:-7px;right:-7px;border-width:1.5px 1.5px 0 0;}
+  .star-frame .corner.bl{bottom:-7px;left:-7px;border-width:0 0 1.5px 1.5px;}
+  .star-frame .corner.br{bottom:-7px;right:-7px;border-width:0 1.5px 1.5px 0;}
+  .star-frame .plate{
+    position:absolute;bottom:-17px;left:50%;transform:translateX(-50%);
+    background:linear-gradient(180deg,#E9C983,#B98F45);
+    color:#33230B;padding:7px 22px;border-radius:2px;
+    font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;white-space:nowrap;
+    box-shadow:0 8px 18px rgba(0,0,0,.4);z-index:4;
+  }
+  .star-frame .glint{
+    position:absolute;inset:12px;overflow:hidden;z-index:2;pointer-events:none;
+  }
+  .star-frame .glint::before{
+    content:'';position:absolute;top:-30%;left:-80%;width:45%;height:160%;
+    background:linear-gradient(100deg,transparent,rgba(255,246,220,.35),transparent);
+    transform:skewX(-20deg);
+  }
+  .star-frame:hover .glint::before{animation:glintSweep 1s ease;}
+  @keyframes glintSweep{to{left:150%;}}
+
+  /* ═══════════ CONVERGENCE ═══════════ */
+  .converge{text-align:center;}
+  .converge .caps{margin-bottom:18px;display:block;}
+  .converge h2{font-family:'Italiana',serif;font-weight:400;font-size:clamp(36px,6vw,66px);margin-bottom:8px;}
+  .converge .serif{font-style:italic;font-size:clamp(18px,2.4vw,22px);color:var(--muted);margin-bottom:64px;}
+
+  .eclipse{
+    position:relative;width:min(520px,86vw);margin:0 auto;
+    border-radius:50% 50% 4px 4px / 34% 34% 4px 4px;
+    overflow:hidden;
+    box-shadow:0 40px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(217,179,106,.5), 0 0 60px rgba(217,179,106,.14);
+  }
+  .eclipse img{width:100%;display:block;transform:scale(1.12);transition:transform 6s ease;}
+  .eclipse.in img{transform:scale(1);}
+  .eclipse::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(180deg, rgba(10,16,32,.34), transparent 34%, transparent 72%, rgba(10,16,32,.5));
+    pointer-events:none;
+  }
+  .eclipse .halo{
+    position:absolute;inset:-2px;border-radius:inherit;pointer-events:none;
+    box-shadow:inset 0 0 0 1px rgba(243,220,164,.35);
+  }
+  .converge .vow{
+    margin-top:56px;font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:clamp(19px,2.6vw,25px);color:var(--champagne);line-height:1.7;max-width:560px;margin-inline:auto;
+  }
+  .converge .vow .w{display:inline-block;opacity:0;transform:translateY(12px);transition:opacity .5s ease, transform .5s var(--ease);}
+  .converge .vow.play .w{opacity:1;transform:none;}
+
+  /* ═══════════ COUNT ═══════════ */
+  .count{text-align:center;}
+  .count-row{display:flex;justify-content:center;gap:clamp(20px,6vw,64px);margin-top:44px;}
+  .count-cell .n{font-family:'Italiana',serif;font-size:clamp(44px,8vw,84px);color:var(--gold-bright);line-height:1;text-shadow:0 0 26px rgba(217,179,106,.35);}
+  .count-cell .l{margin-top:10px;font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:var(--muted);}
+  .count-cell{position:relative;padding:0 clamp(10px,3vw,30px);}
+  .count-cell + .count-cell::before{content:'';position:absolute;left:calc(clamp(10px,3vw,32px) * -1);top:12%;bottom:12%;width:1px;background:linear-gradient(transparent,rgba(217,179,106,.5),transparent);}
+
+  /* ═══════════ CINEMA ═══════════ */
+  .cinema{text-align:center;}
+  .screen-shell{
+    position:relative;max-width:640px;margin:52px auto 0;
+    border-radius:10px;overflow:hidden;
+    box-shadow:0 40px 90px rgba(0,0,0,.65), 0 0 0 1px rgba(217,179,106,.4);
+    background:#000;
+  }
+  .screen-shell video{width:100%;display:block;}
+  .curtain{
+    position:absolute;top:0;bottom:0;width:52%;z-index:5;
+    background:
+      repeating-linear-gradient(90deg,#1B2A52 0 22px,#14203F 22px 44px);
+    transition:transform 1.5s var(--ease);
+    box-shadow:inset 0 -40px 60px rgba(0,0,0,.5);
+  }
+  .curtain.L{left:0;border-right:2px solid rgba(217,179,106,.6);}
+  .curtain.R{right:0;border-left:2px solid rgba(217,179,106,.6);}
+  .screen-shell.open .curtain.L{transform:translateX(-101%);}
+  .screen-shell.open .curtain.R{transform:translateX(101%);}
+  .curtain-cta{
+    position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;gap:14px;
+    align-items:center;justify-content:center;cursor:pointer;color:var(--champagne);
+    transition:opacity .6s ease, visibility .6s;
+  }
+  .screen-shell.open .curtain-cta{opacity:0;visibility:hidden;}
+  .curtain-cta .ring{
+    width:72px;height:72px;border-radius:50%;border:1.5px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;font-size:22px;
+    animation:ringPulse 2.2s ease-in-out infinite;background:rgba(10,16,32,.4);backdrop-filter:blur(3px);
+  }
+  @keyframes ringPulse{0%,100%{box-shadow:0 0 0 0 rgba(217,179,106,.4);}55%{box-shadow:0 0 0 20px rgba(217,179,106,0);}}
+  .curtain-cta span{font-size:11px;letter-spacing:.3em;text-transform:uppercase;}
+  .cinema .note{margin-top:22px;font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--muted);font-size:17px;}
+
+  /* ═══════════ LANTERNS FINALE ═══════════ */
+  .finale{text-align:center;min-height:88svh;display:flex;flex-direction:column;justify-content:center;}
+  .finale h2{font-family:'Italiana',serif;font-weight:400;font-size:clamp(34px,6vw,62px);margin:18px 0 14px;}
+  .finale .serif{font-style:italic;color:var(--muted);font-size:clamp(17px,2.3vw,21px);max-width:520px;margin:0 auto;line-height:1.7;}
+  .lantern-btn{
+    margin:46px auto 0;display:inline-flex;align-items:center;gap:14px;
+    background:transparent;color:var(--gold-bright);cursor:pointer;
+    border:1px solid rgba(217,179,106,.6);border-radius:60px;
+    padding:17px 36px;font-family:'Sora',sans-serif;font-size:12px;letter-spacing:.28em;text-transform:uppercase;
+    transition:background .4s ease, box-shadow .4s ease, transform .3s ease;
+  }
+  .lantern-btn:hover{background:rgba(217,179,106,.1);box-shadow:0 0 34px rgba(217,179,106,.25);transform:translateY(-2px);}
+  .lantern-btn:active{transform:scale(.97);}
+  .lantern-count{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--muted);margin-top:18px;min-height:1.4em;}
+
+  /* ═══════════ SIGNATURE ═══════════ */
+  .sign-block{text-align:center;padding-bottom:16vh;}
+  .sign-block .rule{width:64px;height:1px;background:var(--gold);margin:0 auto 34px;opacity:.7;}
+  .sign-block p{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.3vw,22px);font-style:italic;line-height:1.85;color:#C4CBDA;max-width:600px;margin:0 auto 22px;}
+  .sign-block .who{font-family:'Italiana',serif;font-size:24px;color:var(--gold-bright);margin-top:12px;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;}
+    .rise{opacity:1;transform:none;}
+    .hero h1,.hero .sub,.hero .down,.hero .caps{opacity:1 !important;transform:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<canvas id="fx"></canvas>
+
+<!-- ═══ SEALED ENVELOPE ═══ -->
+<div id="veil">
+  <div class="caps veil-caps">You are invited to a small surprise</div>
+  <div class="envelope" id="envelope" role="button" aria-label="Break the seal and open">
+    <div class="env-body"></div>
+    <div class="env-letter serif">for Hiba &amp; Afsal</div>
+    <div class="env-flap"></div>
+    <div class="seal">H·A</div>
+  </div>
+  <div class="veil-hint">tap the seal to open</div>
+</div>
+
+<div id="story">
+  <svg id="threadSvg" aria-hidden="true">
+    <defs>
+      <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#F3DCA4"/>
+        <stop offset=".5" stop-color="#D9B36A"/>
+        <stop offset="1" stop-color="#F3DCA4"/>
+      </linearGradient>
+    </defs>
+    <path id="threadPath" d=""/>
+  </svg>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero" id="hero">
+    <div class="caps">A story written in the stars</div>
+    <h1>Hiba<span class="and">and</span>Afsal</h1>
+    <p class="sub serif">Some stories don't begin at the wedding. This one began two childhoods ago — and the sky has been taking notes.</p>
+    <div class="down"></div>
+  </section>
+
+  <!-- ═══ CHAPTER I ═══ -->
+  <section class="chapter">
+    <div class="frame-col rise">
+      <div class="star-frame" data-tilt>
+        <div class="mat">
+          <img src="images/hiba-child.jpg" alt="Hiba as a child">
+          <div class="glint"></div>
+        </div>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="plate">Hiba — the dreamer</div>
+      </div>
+    </div>
+    <div class="rise d1">
+      <div class="ch-num">CHAPTER I</div>
+      <h2>A girl with a look that already knew things</h2>
+      <p>Long before the mehndi and the gold, there was this little one in denim overalls — quietly certain, endlessly curious, <em>already impossible to argue with.</em> The stars saw her and started planning.</p>
+    </div>
+  </section>
+
+  <!-- ═══ CHAPTER II ═══ -->
+  <section class="chapter flip">
+    <div class="frame-col rise">
+      <div class="star-frame" data-tilt>
+        <div class="mat">
+          <img src="images/afsal-child.jpg" alt="Afsal as a child">
+          <div class="glint"></div>
+        </div>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="plate">Afsal — the sunshine</div>
+      </div>
+    </div>
+    <div class="rise d1">
+      <div class="ch-num">CHAPTER II</div>
+      <h2>A boy who smiled like he knew the ending</h2>
+      <p>Somewhere else entirely, a small boy grinned at a camera like the world was one big inside joke. He didn't know her yet. <em>But that grin was already hers.</em></p>
+    </div>
+  </section>
+
+  <!-- ═══ CONVERGENCE ═══ -->
+  <section class="converge">
+    <span class="caps rise">Chapter III — the threads meet</span>
+    <h2 class="rise d1">Two stories. One sky.</h2>
+    <p class="serif rise d2">Follow the golden thread — it knew the way all along.</p>
+    <div class="eclipse rise d2" id="eclipse">
+      <img src="images/engagement.jpg" alt="Hiba and Afsal at their engagement">
+      <div class="halo"></div>
+    </div>
+    <p class="vow serif" id="vow"></p>
+  </section>
+
+  <!-- ═══ CHAPTER IV ═══ -->
+  <section class="chapter">
+    <div class="frame-col rise">
+      <div class="star-frame" data-tilt>
+        <div class="mat">
+          <img src="images/nm.JPG" alt="Nismal and Afsal">
+          <div class="glint"></div>
+        </div>
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="plate">The foodie partners</div>
+      </div>
+    </div>
+    <div class="rise d1">
+      <div class="ch-num">CHAPTER IV</div>
+      <h2>The best friend who had dibs first</h2>
+      <p>Long before the rings, this one had already claimed the groom as his foodie partner for life. Every restaurant, every ridiculous order, every "just one more plate" — that was <em>their thing.</em> Hiba, we love you, but you cannot have that. What you can have is all five of us, every single time, forever.</p>
+    </div>
+  </section>
+
+  <!-- ═══ GROUP PHOTO ═══ -->
+  <section class="converge">
+    <span class="caps rise">All five of us</span>
+    <p class="serif rise d1" style="margin-bottom:48px;">At the engagement that started it all.</p>
+    <div class="eclipse rise d1" id="eclipse2">
+      <img src="images/us.jpg" alt="All five of us at the engagement">
+      <div class="halo"></div>
+    </div>
+  </section>
+
+  <!-- ═══ COUNTDOWN ═══ -->
+  <section class="count">
+    <span class="caps rise">Until the stars align</span>
+    <div class="count-row rise d1">
+      <div class="count-cell"><div class="n" id="cN-d">–</div><div class="l">days</div></div>
+      <div class="count-cell"><div class="n" id="cN-h">–</div><div class="l">hours</div></div>
+      <div class="count-cell"><div class="n" id="cN-m">–</div><div class="l">minutes</div></div>
+    </div>
+    <p class="serif rise d2" style="font-style:italic;color:var(--muted);margin-top:34px;">Nikah — 08 · 08 · 2026</p>
+  </section>
+
+  <!-- ═══ CINEMA ═══ -->
+  <section class="cinema">
+    <span class="caps rise">A private premiere</span>
+    <h2 class="rise d1" style="font-family:'Italiana',serif;font-weight:400;font-size:clamp(34px,5.6vw,60px);margin-top:16px;">The smallest guest speaks first</h2>
+    <p class="serif rise d2" style="font-style:italic;color:var(--muted);margin-top:12px;">Three years old. One very important message. Zero rehearsals that went as planned.</p>
+
+    <div class="screen-shell rise d2" id="screenShell">
+      <!-- PLACEHOLDER: drop the real files into /video — wish.mp4 and poster.jpg -->
+      <!-- VIDEO PLACEHOLDER -->
+        <source src="video/wish.mp4" type="video/mp4">
+        The video hasn't been added yet.
+      </video>
+      <div class="curtain L"></div>
+      <div class="curtain R"></div>
+      <div class="curtain-cta" id="curtainCta">
+        <div class="ring">&#9654;</div>
+        <span>pull back the curtains</span>
+      </div>
+    </div>
+    <p class="note">Sound on. She has been practicing her line all week.</p>
+  </section>
+
+  <!-- ═══ LANTERNS ═══ -->
+  <section class="finale" id="finale">
+    <span class="caps rise">One last thing</span>
+    <h2 class="rise d1">Send a wish into their sky</h2>
+    <p class="serif rise d2">In some places, people release lanterns so their blessings travel far. Tap below — every lantern you set free carries one more wish for Hiba &amp; Afsal.</p>
+    <div class="rise d3">
+      <button class="lantern-btn" id="lanternBtn">&#127982; &nbsp;Release a lantern</button>
+      <div class="lantern-count" id="lanternCount"></div>
+    </div>
+  </section>
+
+  <!-- ═══ SIGN OFF ═══ -->
+  <section class="sign-block">
+    <div class="rule rise"></div>
+    <p class="rise d1">May your home be loud with laughter and warm with good food. May you keep choosing each other on the ordinary days, not just the golden ones. And may you always look up at the same sky and feel lucky.</p>
+    <p class="rise d2">We have one small condition, Hiba. Afsal has been our foodie partner for as long as any of us can remember — the one who always finds the best spot, orders everything on the menu, and somehow justifies it all. Please don't take that from us. Instead, let's make this the deal: all five of us, every table, every time. Forever.</p>
+    <div class="who rise d2">With love and full plates, Nismal, Murshi &amp; Emy</div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  /* ── canvases ── */
+  var starsC = document.getElementById('stars'), sx = starsC.getContext('2d');
+  var fxC = document.getElementById('fx'), fx = fxC.getContext('2d');
+  function sizeCanvas(c){ c.width = innerWidth*DPR; c.height = innerHeight*DPR; c.style.width = innerWidth+'px'; c.style.height = innerHeight+'px'; c.getContext('2d').setTransform(DPR,0,0,DPR,0,0); }
+  function sizeAll(){ sizeCanvas(starsC); sizeCanvas(fxC); buildStars(); layoutThread(); }
+  addEventListener('resize', sizeAll);
+
+  /* ── star field + shooting stars ── */
+  var stars = [];
+  function buildStars(){
+    stars = [];
+    var n = Math.floor(innerWidth*innerHeight/5200);
+    for(var i=0;i<n;i++){
+      stars.push({x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+        r:Math.random()*1.15+.25, p:Math.random()*Math.PI*2, s:.5+Math.random()*1.6});
+    }
+  }
+  var shooting = null, nextShot = performance.now()+3000;
+  function drawStars(t){
+    sx.clearRect(0,0,innerWidth,innerHeight);
+    for(var i=0;i<stars.length;i++){
+      var st = stars[i];
+      var a = .25 + .75*Math.abs(Math.sin(st.p + t*0.00055*st.s));
+      sx.globalAlpha = a;
+      sx.fillStyle = i%9===0 ? '#F3DCA4' : '#DCE4F5';
+      sx.beginPath(); sx.arc(st.x, st.y, st.r, 0, 6.2832); sx.fill();
+    }
+    sx.globalAlpha = 1;
+    if(!reduceMotion){
+      if(!shooting && t > nextShot){
+        shooting = {x:Math.random()*innerWidth*.7+innerWidth*.15, y:Math.random()*innerHeight*.3+20,
+          vx:6+Math.random()*4, vy:2.4+Math.random()*1.6, life:0};
+        nextShot = t + 5000 + Math.random()*8000;
+      }
+      if(shooting){
+        shooting.x += shooting.vx; shooting.y += shooting.vy; shooting.life++;
+        var grad = sx.createLinearGradient(shooting.x, shooting.y, shooting.x-shooting.vx*9, shooting.y-shooting.vy*9);
+        grad.addColorStop(0,'rgba(243,220,164,.95)'); grad.addColorStop(1,'rgba(243,220,164,0)');
+        sx.strokeStyle = grad; sx.lineWidth = 1.6;
+        sx.beginPath(); sx.moveTo(shooting.x, shooting.y);
+        sx.lineTo(shooting.x-shooting.vx*9, shooting.y-shooting.vy*9); sx.stroke();
+        if(shooting.life>46 || shooting.x>innerWidth+40) shooting = null;
+      }
+    }
+  }
+
+  /* ── fx particles: sparks / fireworks / lanterns ── */
+  var parts = [], lanterns = [];
+  var GOLDS = ['#F3DCA4','#D9B36A','#FFF2CE','#E8C377'];
+  function spark(x,y,n,spread,grav){
+    for(var i=0;i<n;i++){
+      var a = Math.random()*Math.PI*2, sp = (spread||3)*(0.4+Math.random());
+      parts.push({x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,g:grav==null?0.05:grav,
+        life:0,max:50+Math.random()*35,c:GOLDS[(Math.random()*GOLDS.length)|0],r:1+Math.random()*1.8});
+    }
+  }
+  function rocket(x){
+    parts.push({rocket:true,x:x,y:innerHeight+10,vx:(Math.random()-.5)*1.2,vy:-(8.5+Math.random()*3),g:.09,
+      life:0,max:52+Math.random()*18,c:'#F3DCA4',r:1.8});
+  }
+  function lantern(x){
+    lanterns.push({x:x,y:innerHeight+30,vy:-(0.55+Math.random()*.4),drift:Math.random()*Math.PI*2,
+      w:16+Math.random()*10,life:0,max:900});
+  }
+  function drawFx(t){
+    fx.clearRect(0,0,innerWidth,innerHeight);
+    for(var i=parts.length-1;i>=0;i--){
+      var p = parts[i];
+      p.x+=p.vx; p.y+=p.vy; p.vy+=p.g; p.life++;
+      if(p.rocket && (p.vy>-1 || p.life>p.max)){
+        parts.splice(i,1); spark(p.x,p.y,46,4.6,0.045); continue;
+      }
+      fx.globalAlpha = Math.max(0,1-p.life/p.max);
+      fx.fillStyle = p.c;
+      fx.beginPath(); fx.arc(p.x,p.y,p.r,0,6.2832); fx.fill();
+      if(p.life>=p.max) parts.splice(i,1);
+    }
+    for(var j=lanterns.length-1;j>=0;j--){
+      var L = lanterns[j];
+      L.y += L.vy; L.x += Math.sin(t*0.001 + L.drift)*0.35; L.life++;
+      var alpha = L.y < innerHeight*.35 ? Math.max(0,(L.y-innerHeight*.05)/(innerHeight*.3)) : 1;
+      var flick = .8 + .2*Math.sin(t*0.012 + L.drift*7);
+      fx.globalAlpha = alpha;
+      var glow = fx.createRadialGradient(L.x,L.y,2,L.x,L.y,L.w*2.6);
+      glow.addColorStop(0,'rgba(243,220,164,'+(0.5*flick)+')'); glow.addColorStop(1,'rgba(243,220,164,0)');
+      fx.fillStyle = glow;
+      fx.beginPath(); fx.arc(L.x,L.y,L.w*2.6,0,6.2832); fx.fill();
+      fx.fillStyle = 'rgba(238,190,110,'+(0.9*flick)+')';
+      var w = L.w, h = w*1.35;
+      fx.beginPath();
+      fx.moveTo(L.x-w/2, L.y-h/2);
+      fx.quadraticCurveTo(L.x, L.y-h/2-4, L.x+w/2, L.y-h/2);
+      fx.lineTo(L.x+w*0.36, L.y+h/2);
+      fx.lineTo(L.x-w*0.36, L.y+h/2);
+      fx.closePath(); fx.fill();
+      fx.fillStyle = 'rgba(255,244,214,'+flick+')';
+      fx.fillRect(L.x-w*0.2, L.y+h/2-3, w*0.4, 3);
+      if(L.y < -60 || L.life>L.max) lanterns.splice(j,1);
+    }
+    fx.globalAlpha = 1;
+  }
+
+  function loop(t){ drawStars(t); drawFx(t); requestAnimationFrame(loop); }
+
+  /* ── envelope ── */
+  var veil = document.getElementById('veil'), env = document.getElementById('envelope');
+  var opened = false;
+  env.addEventListener('click', function(){
+    if(opened) return; opened = true;
+    env.classList.add('open');
+    var r = env.getBoundingClientRect();
+    spark(r.left+r.width/2, r.top+r.height*0.52, 42, 4, 0.06);
+    setTimeout(function(){
+      veil.classList.add('gone');
+      document.getElementById('hero').classList.add('begin');
+      setTimeout(function(){ rocket(innerWidth*0.3); rocket(innerWidth*0.7); }, 700);
+    }, 1050);
+    setTimeout(function(){ veil.remove(); }, 2300);
+  });
+
+  /* ── golden thread ── */
+  var story = document.getElementById('story');
+  var svg = document.getElementById('threadSvg');
+  var path = document.getElementById('threadPath');
+  var pathLen = 0;
+  function layoutThread(){
+    var H = story.scrollHeight, W = innerWidth;
+    svg.setAttribute('width', W); svg.setAttribute('height', H);
+    svg.setAttribute('viewBox', '0 0 '+W+' '+H);
+    var cx = W/2, amp = Math.min(W*0.3, 330);
+    var d = 'M '+cx+' '+(innerHeight*0.82);
+    var y = innerHeight*0.82, seg = innerHeight*0.85, side = 1, i = 0;
+    while(y < H - innerHeight*0.35){
+      var y2 = Math.min(y+seg, H-innerHeight*0.35);
+      d += ' C '+(cx+side*amp)+' '+(y+seg*0.33)+', '+(cx-side*amp*0.6)+' '+(y2-seg*0.33)+', '+cx+' '+y2;
+      y = y2; side*=-1; i++;
+    }
+    path.setAttribute('d', d);
+    pathLen = path.getTotalLength();
+    path.style.strokeDasharray = pathLen;
+    updateThread();
+  }
+  function updateThread(){
+    if(!pathLen) return;
+    var max = story.scrollHeight - innerHeight;
+    var prog = Math.min(1, Math.max(0, scrollY / max));
+    path.style.strokeDashoffset = pathLen * (1 - prog*1.08);
+  }
+  addEventListener('scroll', updateThread, {passive:true});
+
+  /* ── reveals ── */
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('in'); });
+  },{threshold:.18});
+  document.querySelectorAll('.rise').forEach(function(el){ io.observe(el); });
+
+  var eclipse = document.getElementById('eclipse');
+  new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ eclipse.classList.add('in'); } });
+  },{threshold:.3}).observe(eclipse);
+
+  var eclipse2 = document.getElementById('eclipse2');
+  new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ eclipse2.classList.add('in'); } });
+  },{threshold:.3}).observe(eclipse2);
+
+  /* ── word-by-word vow ── */
+  var vowText = "From crayon fights to shared forevers — some people simply belong to the same constellation.";
+  var vow = document.getElementById('vow');
+  vowText.split(' ').forEach(function(w,i){
+    var s = document.createElement('span'); s.className='w';
+    s.style.transitionDelay = (i*70)+'ms';
+    s.innerHTML = w+'&nbsp;';
+    vow.appendChild(s);
+  });
+  new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting) vow.classList.add('play'); });
+  },{threshold:.6}).observe(vow);
+
+  /* ── tilt frames ── */
+  if(!reduceMotion){
+    document.querySelectorAll('[data-tilt]').forEach(function(fr){
+      fr.addEventListener('mousemove', function(ev){
+        var r = fr.getBoundingClientRect();
+        var mx = (ev.clientX-r.left)/r.width - .5, my = (ev.clientY-r.top)/r.height - .5;
+        fr.style.transform = 'rotateY('+(mx*10)+'deg) rotateX('+(-my*10)+'deg)';
+      });
+      fr.addEventListener('mouseleave', function(){ fr.style.transform=''; });
+    });
+  }
+
+  /* ── countdown ── */
+  var TARGET = new Date('2026-08-08T10:00:00');
+  function pad(n){ return n<10 ? '0'+n : ''+n; }
+  function tickCount(){
+    var diff = Math.max(0, TARGET - new Date());
+    var d = Math.floor(diff/86400000);
+    var h = Math.floor(diff%86400000/3600000);
+    var m = Math.floor(diff%3600000/60000);
+    document.getElementById('cN-d').textContent = d;
+    document.getElementById('cN-h').textContent = pad(h);
+    document.getElementById('cN-m').textContent = pad(m);
+  }
+  tickCount(); setInterval(tickCount, 20000);
+
+  /* ── cinema curtains ── */
+  var shell = document.getElementById('screenShell');
+  document.getElementById('curtainCta').addEventListener('click', function(){
+    shell.classList.add('open');
+    var r = shell.getBoundingClientRect();
+    spark(r.left+r.width*0.5, r.top+20, 30, 3.6, 0.05);
+    setTimeout(function(){
+      var v = document.getElementById('wishVideo');
+      if(v.play){ v.play().catch(function(){}); }
+    }, 1200);
+  });
+
+  /* ── lanterns + fireworks ── */
+  var released = 0;
+  var phrases = [
+    "One lantern up. The sky says thank you.",
+    "Two wishes and counting…",
+    "That one carried the biryani blessing.",
+    "The stars are starting to notice.",
+    "Okay, the moon is definitely watching now.",
+    "A whole sky of good wishes for them."
+  ];
+  document.getElementById('lanternBtn').addEventListener('click', function(){
+    lantern(innerWidth*0.2 + Math.random()*innerWidth*0.6);
+    released++;
+    if(released%3===0) rocket(innerWidth*(0.25+Math.random()*0.5));
+    document.getElementById('lanternCount').textContent =
+      phrases[Math.min(released-1, phrases.length-1)];
+  });
+  var finaleShown = false;
+  new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting && !finaleShown){
+        finaleShown = true;
+        if(!reduceMotion){
+          rocket(innerWidth*0.28); 
+          setTimeout(function(){ rocket(innerWidth*0.72); }, 500);
+          setTimeout(function(){ lantern(innerWidth*0.5); }, 900);
+        }
+      }
+    });
+  },{threshold:.4}).observe(document.getElementById('finale'));
+
+  /* boot */
+  sizeAll();
+  requestAnimationFrame(loop);
+  addEventListener('load', layoutThread);
+  setTimeout(layoutThread, 800);
+})();
+</script>
+</body>
+</html>
