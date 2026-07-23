@@ -3,10 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Hiba &amp; Afsal — Written in the Stars</title>
+<meta name="theme-color" content="#0A1020">
+<meta name="description" content="A wish written in the stars, from our family to Hiba and Afsal.">
+<title>Hiba &amp; Afsal · Written in the Stars</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: 'RoovenRegular';
+    src: url('../RoovenRegular-2vwMW.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+</style>
 <style>
   :root{
     --night:#0A1020;
@@ -17,28 +28,88 @@
     --ivory:#F7F2E7;
     --muted:#8E97AD;
     --ease:cubic-bezier(.22,.75,.25,1);
+    --pad-x:clamp(20px,5vw,32px);
   }
   *{box-sizing:border-box;margin:0;padding:0;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:smooth;overflow-x:clip;}
   body{
     background:radial-gradient(ellipse 120% 80% at 50% -10%, var(--night2), var(--night) 60%);
     color:var(--ivory);
     font-family:'Sora',sans-serif;
-    overflow-x:hidden;
+    overflow-x:clip;
     min-height:100vh;
   }
   ::selection{background:var(--gold);color:var(--night);}
+  img{max-width:100%;}
 
   canvas#stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
   canvas#fx{position:fixed;inset:0;z-index:40;pointer-events:none;}
 
+  /* soft nebula glows: the quiet replacement for the old golden thread */
+  #nebula{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  #nebula i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.4;}
+  #nebula i:nth-child(1){width:56vmax;height:38vmax;left:-16vmax;top:-8vmax;
+    background:radial-gradient(closest-side, rgba(38,58,112,.8), transparent 70%);
+    animation:nebDrift 46s ease-in-out infinite alternate;}
+  #nebula i:nth-child(2){width:44vmax;height:34vmax;right:-14vmax;top:26vh;
+    background:radial-gradient(closest-side, rgba(217,179,106,.16), transparent 70%);
+    animation:nebDrift 52s ease-in-out infinite alternate-reverse;}
+  #nebula i:nth-child(3){width:50vmax;height:36vmax;left:-10vmax;bottom:-14vmax;
+    background:radial-gradient(closest-side, rgba(60,44,110,.5), transparent 70%);
+    animation:nebDrift 58s ease-in-out infinite alternate;}
+  @keyframes nebDrift{to{transform:translate3d(6vmax,3vmax,0) scale(1.12);}}
+
+  /* film grain for depth */
+  #grain{position:fixed;inset:-50%;z-index:45;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation:grainShift 9s steps(6) infinite;}
+  @keyframes grainShift{
+    0%,100%{transform:translate(0,0);}
+    20%{transform:translate(-4%,3%);}
+    40%{transform:translate(3%,-5%);}
+    60%{transform:translate(-3%,-2%);}
+    80%{transform:translate(4%,4%);}
+  }
+
+  /* self-drawing constellations: each chapter closes with its own star sign.
+     Stars pop into the sky first, then gold lines draw themselves between
+     them as you arrive. Tap one and it bursts stardust. */
+  .const{
+    position:relative;z-index:2;
+    width:min(340px,86vw);height:150px;margin:0 auto;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  .const svg{width:100%;height:100%;display:block;overflow:visible;}
+  .const .cl{
+    fill:none;stroke:var(--gold);stroke-width:1.3;stroke-linecap:round;opacity:.85;
+    filter:drop-shadow(0 0 5px rgba(217,179,106,.6));
+    transition:stroke-dashoffset 2.2s var(--ease) .55s;
+  }
+  .const .st{
+    fill:var(--gold-bright);
+    filter:drop-shadow(0 0 6px rgba(243,220,164,.95));
+    transform-box:fill-box;transform-origin:center;transform:scale(0);
+    transition:transform .6s var(--ease);
+  }
+  .const.draw .cl{stroke-dashoffset:0 !important;}
+  .const.draw .st{transform:scale(1);animation:stTw 3.2s ease-in-out infinite;}
+  @keyframes stTw{0%,100%{opacity:1;}50%{opacity:.45;}}
+  .const.pulse svg{animation:constPulse .9s ease;}
+  @keyframes constPulse{
+    30%{filter:brightness(1.8) drop-shadow(0 0 16px rgba(243,220,164,.7));transform:scale(1.08);}
+    100%{filter:none;transform:none;}
+  }
+  @media(hover:hover){.const:hover svg{transform:scale(1.04);transition:transform .5s var(--ease);}}
+
   .serif{font-family:'Cormorant Garamond',serif;}
-  .caps{font-family:'Sora',sans-serif;font-weight:600;letter-spacing:.34em;text-transform:uppercase;font-size:11px;color:var(--gold);}
+  .caps{font-family:'RoovenRegular',serif;font-weight:600;letter-spacing:.34em;text-transform:uppercase;font-size:11px;color:var(--gold);}
+  .veil-hint{font-family:'RoovenRegular',serif;}
 
   /* ═══════════ ENVELOPE INTRO ═══════════ */
   #veil{
     position:fixed;inset:0;z-index:100;
     display:flex;align-items:center;justify-content:center;flex-direction:column;gap:34px;
+    padding:24px;text-align:center;
     background:radial-gradient(ellipse 120% 90% at 50% 0%, #131E3C, #070C18 65%);
     transition:opacity 1.1s ease, visibility 1.1s;
   }
@@ -47,26 +118,36 @@
   @keyframes vFade{to{opacity:1;}}
 
   .envelope{
-    position:relative;width:min(320px,80vw);aspect-ratio:1.45;
+    position:relative;width:min(320px,82vw);aspect-ratio:1.45;
     cursor:pointer;
     opacity:0;transform:translateY(26px);
-    animation:vRise 1.1s var(--ease) .55s forwards;
-    filter:drop-shadow(0 30px 60px rgba(0,0,0,.6));
+    animation:vRise .85s var(--ease) .35s forwards;
+    filter:drop-shadow(0 36px 70px rgba(0,0,0,.72)) drop-shadow(0 0 46px rgba(217,179,106,.10));
   }
   @keyframes vRise{to{opacity:1;transform:translateY(0);}}
+  .envelope::after{ /* slow gold shimmer sweeping the embossed face */
+    content:'';position:absolute;inset:0;border-radius:6px;z-index:4;pointer-events:none;
+    background:linear-gradient(115deg, transparent 40%, rgba(243,220,164,.14) 50%, transparent 60%);
+    background-size:260% 100%;background-position:130% 0;
+    animation:envSheen 5.2s ease-in-out 2.2s infinite;
+  }
+  @keyframes envSheen{0%{background-position:130% 0;}45%,100%{background-position:-130% 0;}}
   .env-body{
     position:absolute;inset:0;border-radius:6px;
     background:linear-gradient(160deg,#182647,#0F1830);
-    border:1px solid rgba(217,179,106,.45);
+    border:1px solid rgba(217,179,106,.55);
+    box-shadow:inset 0 0 0 1px rgba(7,12,24,.75), inset 0 0 0 2.5px rgba(243,220,164,.10), inset 0 0 26px rgba(0,0,0,.35);
     overflow:hidden;
   }
-  .env-body::before,.env-body::after{
+  .env-body::before{
     content:'';position:absolute;inset:0;
-  }
-  .env-body::before{ /* lower V folds */
     background:
       linear-gradient(63deg, rgba(217,179,106,.16) 0 1.5px, transparent 1.5px) left bottom/52% 100% no-repeat,
       linear-gradient(-63deg, rgba(217,179,106,.16) 0 1.5px, transparent 1.5px) right bottom/52% 100% no-repeat;
+  }
+  .env-body::after{ /* paper grain */
+    content:'';position:absolute;inset:0;opacity:.06;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   .env-flap{
     position:absolute;left:0;right:0;top:0;height:56%;
@@ -74,7 +155,7 @@
     clip-path:polygon(0 0, 100% 0, 50% 100%);
     border-top:1px solid rgba(217,179,106,.5);
     transform-origin:top center;
-    transition:transform .9s var(--ease);
+    transition:transform .55s var(--ease);
     z-index:2;
   }
   .envelope.open .env-flap{transform:rotateX(168deg);}
@@ -83,7 +164,7 @@
     background:linear-gradient(180deg,var(--ivory),#E7DCC2);
     border-radius:3px;z-index:1;
     display:flex;align-items:center;justify-content:center;
-    transition:transform 1s var(--ease) .35s;
+    transition:transform .75s var(--ease) .22s;
     color:#5B4A2C;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;
   }
   .envelope.open .env-letter{transform:translateY(-34%);}
@@ -99,15 +180,11 @@
   }
   @keyframes sealPulse{0%,100%{box-shadow:0 8px 22px rgba(0,0,0,.55), 0 0 0 0 rgba(217,179,106,.35), inset 0 2px 6px rgba(255,255,255,.35);}50%{box-shadow:0 8px 22px rgba(0,0,0,.55), 0 0 0 18px rgba(217,179,106,0), inset 0 2px 6px rgba(255,255,255,.35);}}
   .envelope.open .seal{transform:translate(-50%,-50%) scale(1.6) rotate(18deg);opacity:0;}
-  .veil-hint{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);opacity:0;animation:vFade 1.2s ease 1.4s forwards;}
+  .veil-hint{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);opacity:0;animation:vFade 1.2s ease 1s forwards;}
 
   /* ═══════════ STORY SHELL ═══════════ */
   #story{position:relative;z-index:1;}
-  #threadSvg{position:absolute;top:0;left:0;width:100%;pointer-events:none;z-index:1;}
-  #threadSvg path{fill:none;stroke:url(#goldGrad);stroke-width:1.6;opacity:.85;
-    filter:drop-shadow(0 0 6px rgba(217,179,106,.45));}
-
-  section{position:relative;z-index:2;padding:15vh 24px;max-width:1060px;margin:0 auto;}
+  section{position:relative;z-index:2;padding:clamp(72px,13vh,140px) var(--pad-x);max-width:1060px;margin:0 auto;}
 
   .rise{opacity:0;transform:translateY(46px);transition:opacity 1s ease, transform 1s var(--ease);}
   .rise.in{opacity:1;transform:none;}
@@ -115,13 +192,15 @@
   .rise.d2{transition-delay:.26s;}
   .rise.d3{transition-delay:.4s;}
 
+  @keyframes twinkleOrn{0%,100%{opacity:.65;transform:scale(1);}50%{opacity:1;transform:scale(1.18);}}
+
   /* ═══════════ HERO ═══════════ */
   .hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:26px;}
   .hero .caps{opacity:0;}
   .hero.begin .caps{animation:vFade 1s ease .2s forwards;}
   .hero h1{
     font-family:'Italiana',serif;font-weight:400;
-    font-size:clamp(58px,13vw,150px);line-height:.98;
+    font-size:clamp(64px,14vw,150px);line-height:.98;
     background:linear-gradient(100deg,var(--gold) 20%,var(--gold-bright) 40%,#FFF6DF 50%,var(--gold-bright) 60%,var(--gold) 80%);
     background-size:220% 100%;
     -webkit-background-clip:text;background-clip:text;color:transparent;
@@ -142,15 +221,16 @@
   /* ═══════════ CHAPTERS ═══════════ */
   .chapter{display:grid;grid-template-columns:1fr 1fr;gap:8vw;align-items:center;}
   .chapter.flip .frame-col{order:2;}
-  @media(max-width:760px){.chapter{grid-template-columns:1fr;gap:52px;}.chapter.flip .frame-col{order:0;}}
   .ch-num{font-family:'Italiana',serif;font-size:15px;letter-spacing:.44em;color:var(--gold);margin-bottom:16px;}
   .chapter h2{font-family:'Italiana',serif;font-weight:400;font-size:clamp(34px,5vw,56px);line-height:1.08;margin-bottom:20px;}
   .chapter p{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.2vw,21px);line-height:1.75;color:#C4CBDA;}
   .chapter p em{color:var(--gold-bright);}
 
   .frame-col{display:flex;justify-content:center;perspective:1100px;}
+  .floaty{animation:floaty 7s ease-in-out infinite alternate;}
+  @keyframes floaty{from{transform:translateY(-5px);}to{transform:translateY(6px);}}
   .star-frame{
-    position:relative;width:min(310px,74vw);
+    position:relative;width:min(310px,76vw);
     transition:transform .18s linear;
     will-change:transform;
   }
@@ -164,6 +244,7 @@
     content:'';position:absolute;inset:6px;border:1px solid rgba(217,179,106,.35);pointer-events:none;z-index:2;
   }
   .star-frame img{width:100%;display:block;aspect-ratio:.86;object-fit:cover;filter:saturate(1.04) contrast(1.02);}
+  .star-frame img.face{aspect-ratio:.95;object-position:50% 32%;}
   .star-frame .corner{position:absolute;width:22px;height:22px;border-color:var(--gold);border-style:solid;z-index:3;}
   .star-frame .corner.tl{top:-7px;left:-7px;border-width:1.5px 0 0 1.5px;}
   .star-frame .corner.tr{top:-7px;right:-7px;border-width:1.5px 1.5px 0 0;}
@@ -191,23 +272,25 @@
   .converge{text-align:center;}
   .converge .caps{margin-bottom:18px;display:block;}
   .converge h2{font-family:'Italiana',serif;font-weight:400;font-size:clamp(36px,6vw,66px);margin-bottom:8px;}
-  .converge .serif{font-style:italic;font-size:clamp(18px,2.4vw,22px);color:var(--muted);margin-bottom:64px;}
+  .converge .serif{font-style:italic;font-size:clamp(18px,2.4vw,22px);color:var(--muted);margin-bottom:56px;}
 
   .eclipse{
-    position:relative;width:min(520px,86vw);margin:0 auto;
-    border-radius:50% 50% 4px 4px / 34% 34% 4px 4px;
+    position:relative;width:min(560px,92vw);margin:0 auto;
+    aspect-ratio:1.55;
+    border-radius:50% 50% 6px 6px / 36% 36% 6px 6px;
     overflow:hidden;
     box-shadow:0 40px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(217,179,106,.5), 0 0 60px rgba(217,179,106,.14);
   }
-  .eclipse img{width:100%;display:block;transform:scale(1.12);transition:transform 6s ease;}
-  .eclipse.in img{transform:scale(1);}
+  .eclipse img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.16);transition:transform 6s ease;}
+  .eclipse.in img{transform:scale(1.06);}
+  .eclipse.wide{aspect-ratio:1.42;}
   .eclipse::after{
     content:'';position:absolute;inset:0;
     background:linear-gradient(180deg, rgba(10,16,32,.34), transparent 34%, transparent 72%, rgba(10,16,32,.5));
     pointer-events:none;
   }
   .eclipse .halo{
-    position:absolute;inset:-2px;border-radius:inherit;pointer-events:none;
+    position:absolute;inset:-2px;border-radius:inherit;pointer-events:none;z-index:2;
     box-shadow:inset 0 0 0 1px rgba(243,220,164,.35);
   }
   .converge .vow{
@@ -217,23 +300,64 @@
   .converge .vow .w{display:inline-block;opacity:0;transform:translateY(12px);transition:opacity .5s ease, transform .5s var(--ease);}
   .converge .vow.play .w{opacity:1;transform:none;}
 
+  /* ═══════════ NOW: THE TWO OF THEM TODAY ═══════════ */
+  .now{text-align:center;}
+  .now .caps{display:block;margin-bottom:16px;}
+  .now h2{font-family:'Italiana',serif;font-weight:400;font-size:clamp(34px,5.6vw,60px);margin-bottom:14px;}
+  .now .lede{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(18px,2.4vw,22px);color:var(--muted);max-width:520px;margin:0 auto 64px;line-height:1.7;}
+  .duo{display:flex;justify-content:center;align-items:center;gap:0;}
+  .duo .polar{
+    position:relative;width:min(280px,42vw);
+    background:linear-gradient(150deg,#1A2647,#101A33);
+    border:1px solid rgba(217,179,106,.55);
+    padding:12px 12px 18px;border-radius:3px;
+    box-shadow:0 34px 70px rgba(0,0,0,.55);
+    transition:transform .6s var(--ease), box-shadow .6s ease;
+  }
+  .duo .polar img{width:100%;display:block;object-fit:cover;filter:saturate(1.04) contrast(1.02);}
+  .duo .polar .tag{
+    margin-top:13px;font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:16px;color:var(--champagne);
+  }
+  .duo .polar.her{transform:rotate(-4.5deg) translateX(14px);z-index:1;}
+  .duo .polar.him{transform:rotate(3.5deg) translateX(-14px) translateY(18px);z-index:2;}
+  .duo .polar.her img{aspect-ratio:.88;object-position:50% 6%;}
+  .duo .polar.him img{aspect-ratio:.88;object-position:50% 38%;}
+  .duo:hover .polar.her{transform:rotate(-2deg) translateX(8px);}
+  .duo:hover .polar.him{transform:rotate(1.5deg) translateX(-8px) translateY(12px);}
+  .duo .polar::after{
+    content:'✦';position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+    color:var(--gold);font-size:14px;text-shadow:0 0 12px rgba(217,179,106,.9);
+  }
+  .now .after{margin-top:64px;font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:clamp(18px,2.4vw,22px);color:#C4CBDA;max-width:540px;margin-inline:auto;line-height:1.75;}
+  .now .after em{color:var(--gold-bright);}
+
   /* ═══════════ COUNT ═══════════ */
   .count{text-align:center;}
-  .count-row{display:flex;justify-content:center;gap:clamp(20px,6vw,64px);margin-top:44px;}
-  .count-cell .n{font-family:'Italiana',serif;font-size:clamp(44px,8vw,84px);color:var(--gold-bright);line-height:1;text-shadow:0 0 26px rgba(217,179,106,.35);}
+  .count-row{display:flex;justify-content:center;gap:clamp(14px,4.5vw,56px);margin-top:44px;}
+  .count-cell .n{font-family:'Italiana',serif;font-size:clamp(38px,8vw,84px);color:var(--gold-bright);line-height:1;text-shadow:0 0 26px rgba(217,179,106,.35);font-variant-numeric:tabular-nums;}
   .count-cell .l{margin-top:10px;font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:var(--muted);}
-  .count-cell{position:relative;padding:0 clamp(10px,3vw,30px);}
-  .count-cell + .count-cell::before{content:'';position:absolute;left:calc(clamp(10px,3vw,32px) * -1);top:12%;bottom:12%;width:1px;background:linear-gradient(transparent,rgba(217,179,106,.5),transparent);}
+  .count-cell{position:relative;padding:0 clamp(6px,2.4vw,26px);}
+  .count-cell + .count-cell::before{content:'';position:absolute;left:calc(clamp(7px,2.25vw,28px) * -1);top:12%;bottom:12%;width:1px;background:linear-gradient(transparent,rgba(217,179,106,.5),transparent);}
 
   /* ═══════════ CINEMA ═══════════ */
   .cinema{text-align:center;}
   .screen-shell{
     position:relative;max-width:640px;margin:52px auto 0;
+    aspect-ratio:16/10;
     border-radius:10px;overflow:hidden;
     box-shadow:0 40px 90px rgba(0,0,0,.65), 0 0 0 1px rgba(217,179,106,.4);
     background:#000;
   }
-  .screen-shell video{width:100%;display:block;}
+  .screen-shell video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;}
+  .reserved{
+    position:absolute;inset:0;display:flex;flex-direction:column;gap:16px;
+    align-items:center;justify-content:center;padding:32px;
+    background:radial-gradient(ellipse 90% 80% at 50% 30%, #16234a, #0a1020 75%);
+  }
+  .reserved .tw{color:var(--gold);font-size:18px;text-shadow:0 0 16px rgba(217,179,106,.9);animation:twinkleOrn 3s ease-in-out infinite;}
+  .reserved p{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(16px,2.4vw,20px);color:var(--champagne);max-width:380px;line-height:1.6;}
   .curtain{
     position:absolute;top:0;bottom:0;width:52%;z-index:5;
     background:
@@ -270,16 +394,40 @@
     border:1px solid rgba(217,179,106,.6);border-radius:60px;
     padding:17px 36px;font-family:'Sora',sans-serif;font-size:12px;letter-spacing:.28em;text-transform:uppercase;
     transition:background .4s ease, box-shadow .4s ease, transform .3s ease;
+    -webkit-tap-highlight-color:transparent;
   }
   .lantern-btn:hover{background:rgba(217,179,106,.1);box-shadow:0 0 34px rgba(217,179,106,.25);transform:translateY(-2px);}
   .lantern-btn:active{transform:scale(.97);}
   .lantern-count{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--muted);margin-top:18px;min-height:1.4em;}
 
   /* ═══════════ SIGNATURE ═══════════ */
-  .sign-block{text-align:center;padding-bottom:16vh;}
+  .sign-block{text-align:center;padding-bottom:calc(14vh + env(safe-area-inset-bottom));}
   .sign-block .rule{width:64px;height:1px;background:var(--gold);margin:0 auto 34px;opacity:.7;}
   .sign-block p{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.3vw,22px);font-style:italic;line-height:1.85;color:#C4CBDA;max-width:600px;margin:0 auto 22px;}
-  .sign-block .who{font-family:'Italiana',serif;font-size:24px;color:var(--gold-bright);margin-top:12px;}
+  .dua{margin:44px auto 10px;max-width:620px;}
+  .dua .ar{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(22px,3.4vw,30px);line-height:2;color:var(--gold-bright);
+    text-shadow:0 0 24px rgba(217,179,106,.25);
+    direction:rtl;
+  }
+  .dua .tr{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(15px,2vw,18px);color:var(--muted);margin-top:14px;line-height:1.7;}
+  .sign-block .who{font-family:'Italiana',serif;font-size:24px;color:var(--gold-bright);margin-top:30px;}
+
+  /* ═══════════ MOBILE ═══════════ */
+  @media(max-width:760px){
+    .chapter{grid-template-columns:1fr;gap:56px;text-align:center;}
+    .chapter.flip .frame-col{order:0;}
+    .duo{flex-direction:column;gap:34px;}
+    .duo .polar{width:min(300px,76vw);}
+    .duo .polar.her{transform:rotate(-3deg);}
+    .duo .polar.him{transform:rotate(2.5deg);}
+  }
+  @media(max-width:430px){
+    .star-frame .plate{font-size:13.5px;padding:6px 16px;}
+    .count-cell .l{letter-spacing:.22em;}
+    .curtain-cta .ring{width:60px;height:60px;}
+  }
 
   @media (prefers-reduced-motion: reduce){
     *{animation:none !important;transition:none !important;}
@@ -290,13 +438,15 @@
 </head>
 <body>
 
+<div id="nebula" aria-hidden="true"><i></i><i></i><i></i></div>
 <canvas id="stars"></canvas>
 <canvas id="fx"></canvas>
+<div id="grain" aria-hidden="true"></div>
 
 <!-- ═══ SEALED ENVELOPE ═══ -->
 <div id="veil">
   <div class="caps veil-caps">You are invited to a small surprise</div>
-  <div class="envelope" id="envelope" role="button" aria-label="Break the seal and open">
+  <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Break the seal and open">
     <div class="env-body"></div>
     <div class="env-letter serif">for Hiba &amp; Afsal</div>
     <div class="env-flap"></div>
@@ -306,56 +456,52 @@
 </div>
 
 <div id="story">
-  <svg id="threadSvg" aria-hidden="true">
-    <defs>
-      <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#F3DCA4"/>
-        <stop offset=".5" stop-color="#D9B36A"/>
-        <stop offset="1" stop-color="#F3DCA4"/>
-      </linearGradient>
-    </defs>
-    <path id="threadPath" d=""/>
-  </svg>
 
   <!-- ═══ HERO ═══ -->
   <section class="hero" id="hero">
-    <div class="caps">A story written in the stars</div>
+    <div class="caps">A wish from our family, written in the stars</div>
     <h1>Hiba<span class="and">and</span>Afsal</h1>
-    <p class="sub serif">Some stories don't begin at the wedding. This one began two childhoods ago — and the sky has been taking notes.</p>
+    <p class="sub serif">Some stories don't begin at the wedding. This one began two childhoods ago, and the sky has been taking notes.</p>
     <div class="down"></div>
   </section>
 
   <!-- ═══ CHAPTER I ═══ -->
   <section class="chapter">
     <div class="frame-col rise">
-      <div class="star-frame" data-tilt>
-        <div class="mat">
-          <img src="images/hiba-child.jpg" alt="Hiba as a child">
-          <div class="glint"></div>
+      <div class="floaty">
+        <div class="star-frame" data-tilt>
+          <div class="mat">
+            <img class="face" src="images/hiba-child.PNG" alt="Hiba as a child">
+            <div class="glint"></div>
+          </div>
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="plate">Hiba, the dreamer</div>
         </div>
-        <div class="corner tl"></div><div class="corner tr"></div>
-        <div class="corner bl"></div><div class="corner br"></div>
-        <div class="plate">Hiba — the dreamer</div>
       </div>
     </div>
     <div class="rise d1">
       <div class="ch-num">CHAPTER I</div>
       <h2>A girl with a look that already knew things</h2>
-      <p>Long before the mehndi and the gold, there was this little one in denim overalls — quietly certain, endlessly curious, <em>already impossible to argue with.</em> The stars saw her and started planning.</p>
+      <p>Long before the mehndi and the gold, there was this little one: a perfect glossy bob, a favourite black frock, and big bright eyes that seemed to have read the last page of the story already. <em>The stars saw her and started planning.</em></p>
     </div>
   </section>
+
+  <div class="const" data-shape="bow" title="the dreamer's bow"></div>
 
   <!-- ═══ CHAPTER II ═══ -->
   <section class="chapter flip">
     <div class="frame-col rise">
-      <div class="star-frame" data-tilt>
-        <div class="mat">
-          <img src="images/afsal-child.jpg" alt="Afsal as a child">
-          <div class="glint"></div>
+      <div class="floaty">
+        <div class="star-frame" data-tilt>
+          <div class="mat">
+            <img src="images/afsal-child.jpg" alt="Afsal as a child">
+            <div class="glint"></div>
+          </div>
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="plate">Afsal, the sunshine</div>
         </div>
-        <div class="corner tl"></div><div class="corner tr"></div>
-        <div class="corner bl"></div><div class="corner br"></div>
-        <div class="plate">Afsal — the sunshine</div>
       </div>
     </div>
     <div class="rise d1">
@@ -365,35 +511,61 @@
     </div>
   </section>
 
+  <div class="const" data-shape="sun" title="the sunshine"></div>
+
   <!-- ═══ CONVERGENCE ═══ -->
   <section class="converge">
-    <span class="caps rise">Chapter III — the threads meet</span>
+    <span class="caps rise">Chapter III · the threads meet</span>
     <h2 class="rise d1">Two stories. One sky.</h2>
-    <p class="serif rise d2">Follow the golden thread — it knew the way all along.</p>
+    <p class="serif rise d2">The stars kept their promise.</p>
     <div class="eclipse rise d2" id="eclipse">
-      <img src="images/engagement.jpg" alt="Hiba and Afsal at their engagement">
+      <img src="images/engagement.jpg" alt="Hiba and Afsal at their engagement" style="object-position:50% 56%;">
       <div class="halo"></div>
     </div>
     <p class="vow serif" id="vow"></p>
   </section>
 
-  <!-- ═══ CHAPTER IV ═══ -->
+  <div class="const" data-shape="rings" title="the threads meet"></div>
+
+  <!-- ═══ NOW ═══ -->
+  <section class="now">
+    <span class="caps rise">Chapter IV · the dreamer &amp; the sunshine, today</span>
+    <h2 class="rise d1">The bob grew out. The grin never did.</h2>
+    <p class="lede rise d2">Somewhere between then and now, they became exactly the two people we would have picked for each other anyway.</p>
+    <div class="duo rise d2">
+      <div class="polar her">
+        <img src="images/Hiba.jpg" alt="Hiba today">
+        <div class="tag">still the dreamer</div>
+      </div>
+      <div class="polar him">
+        <img src="images/Afsal.jpg" alt="Afsal today">
+        <div class="tag">still the sunshine</div>
+      </div>
+    </div>
+    <p class="after rise d3">Two different cities, two different lives, and somehow <em>one same direction all along.</em> Our family could not have wished for a better pair to wish upon.</p>
+  </section>
+
+  <div class="const" data-shape="heart" title="one heart"></div>
+
+  <!-- ═══ CHAPTER V ═══ -->
   <section class="chapter">
     <div class="frame-col rise">
-      <div class="star-frame" data-tilt>
-        <div class="mat">
-          <img src="images/nm.JPG" alt="Nismal and Afsal">
-          <div class="glint"></div>
+      <div class="floaty">
+        <div class="star-frame" data-tilt>
+          <div class="mat">
+            <img src="images/nm.JPG" alt="Nismal and Afsal">
+            <div class="glint"></div>
+          </div>
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="plate">The foodie partners</div>
         </div>
-        <div class="corner tl"></div><div class="corner tr"></div>
-        <div class="corner bl"></div><div class="corner br"></div>
-        <div class="plate">The foodie partners</div>
       </div>
     </div>
     <div class="rise d1">
-      <div class="ch-num">CHAPTER IV</div>
+      <div class="ch-num">CHAPTER V</div>
       <h2>The best friend who had dibs first</h2>
-      <p>Long before the rings, this one had already claimed the groom as his foodie partner for life. Every restaurant, every ridiculous order, every "just one more plate" — that was <em>their thing.</em> Hiba, we love you, but you cannot have that. What you can have is all five of us, every single time, forever.</p>
+      <p>Long before the rings, this one had already claimed the groom as his foodie partner for life. Every restaurant, every ridiculous order, every "just one more plate", that was <em>their thing.</em> Hiba, we love you, but you cannot have that. What you can have is all five of us, every single time, forever.</p>
     </div>
   </section>
 
@@ -401,11 +573,13 @@
   <section class="converge">
     <span class="caps rise">All five of us</span>
     <p class="serif rise d1" style="margin-bottom:48px;">At the engagement that started it all.</p>
-    <div class="eclipse rise d1" id="eclipse2">
+    <div class="eclipse wide rise d1" id="eclipse2">
       <img src="images/us.jpg" alt="All five of us at the engagement">
       <div class="halo"></div>
     </div>
   </section>
+
+  <div class="const" data-shape="hourglass" title="until the day"></div>
 
   <!-- ═══ COUNTDOWN ═══ -->
   <section class="count">
@@ -414,8 +588,9 @@
       <div class="count-cell"><div class="n" id="cN-d">–</div><div class="l">days</div></div>
       <div class="count-cell"><div class="n" id="cN-h">–</div><div class="l">hours</div></div>
       <div class="count-cell"><div class="n" id="cN-m">–</div><div class="l">minutes</div></div>
+      <div class="count-cell"><div class="n" id="cN-s">–</div><div class="l">seconds</div></div>
     </div>
-    <p class="serif rise d2" style="font-style:italic;color:var(--muted);margin-top:34px;">Nikah — 08 · 08 · 2026</p>
+    <p class="serif rise d2" style="font-style:italic;color:var(--muted);margin-top:34px;">Nikah · 08 · 08 · 2026</p>
   </section>
 
   <!-- ═══ CINEMA ═══ -->
@@ -425,11 +600,13 @@
     <p class="serif rise d2" style="font-style:italic;color:var(--muted);margin-top:12px;">Three years old. One very important message. Zero rehearsals that went as planned.</p>
 
     <div class="screen-shell rise d2" id="screenShell">
-      <!-- PLACEHOLDER: drop the real files into /video — wish.mp4 and poster.jpg -->
-      <!-- VIDEO PLACEHOLDER -->
+      <video id="wishVideo" playsinline preload="metadata">
         <source src="video/wish.mp4" type="video/mp4">
-        The video hasn't been added yet.
       </video>
+      <div class="reserved" id="reserved" hidden>
+        <div class="tw">✦</div>
+        <p>Her message is being kept safe until the big day. Consider this seat reserved.</p>
+      </div>
       <div class="curtain L"></div>
       <div class="curtain R"></div>
       <div class="curtain-cta" id="curtainCta">
@@ -443,8 +620,8 @@
   <!-- ═══ LANTERNS ═══ -->
   <section class="finale" id="finale">
     <span class="caps rise">One last thing</span>
-    <h2 class="rise d1">Send a wish into their sky</h2>
-    <p class="serif rise d2">In some places, people release lanterns so their blessings travel far. Tap below — every lantern you set free carries one more wish for Hiba &amp; Afsal.</p>
+    <h2 class="rise d1">We packed our wishes into these lanterns</h2>
+    <p class="serif rise d2">In some places, people release lanterns so their blessings travel far. Ours are already lit and waiting. Tap below and set them loose into your sky.</p>
     <div class="rise d3">
       <button class="lantern-btn" id="lanternBtn">&#127982; &nbsp;Release a lantern</button>
       <div class="lantern-count" id="lanternCount"></div>
@@ -455,8 +632,12 @@
   <section class="sign-block">
     <div class="rule rise"></div>
     <p class="rise d1">May your home be loud with laughter and warm with good food. May you keep choosing each other on the ordinary days, not just the golden ones. And may you always look up at the same sky and feel lucky.</p>
-    <p class="rise d2">We have one small condition, Hiba. Afsal has been our foodie partner for as long as any of us can remember — the one who always finds the best spot, orders everything on the menu, and somehow justifies it all. Please don't take that from us. Instead, let's make this the deal: all five of us, every table, every time. Forever.</p>
-    <div class="who rise d2">With love and full plates, Nismal, Murshi &amp; Emy</div>
+    <p class="rise d2">We have one small condition, Hiba. Afsal has been our foodie partner for as long as any of us can remember: the one who always finds the best spot, orders everything on the menu, and somehow justifies it all. Please don't take that from us. Instead, let's make this the deal: all five of us, every table, every time. Forever.</p>
+    <div class="dua rise d2">
+      <p class="ar" lang="ar">بَارَكَ اللَّهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ</p>
+      <p class="tr">May Allah bless you both, shower His blessings upon you, and join you together in goodness.</p>
+    </div>
+    <div class="who rise d3">With love and full plates, Nismal, Murshi &amp; Emy</div>
   </section>
 </div>
 
@@ -464,13 +645,14 @@
 (function(){
   "use strict";
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var DPR = Math.min(window.devicePixelRatio || 1, 2);
 
   /* ── canvases ── */
   var starsC = document.getElementById('stars'), sx = starsC.getContext('2d');
   var fxC = document.getElementById('fx'), fx = fxC.getContext('2d');
   function sizeCanvas(c){ c.width = innerWidth*DPR; c.height = innerHeight*DPR; c.style.width = innerWidth+'px'; c.style.height = innerHeight+'px'; c.getContext('2d').setTransform(DPR,0,0,DPR,0,0); }
-  function sizeAll(){ sizeCanvas(starsC); sizeCanvas(fxC); buildStars(); layoutThread(); }
+  function sizeAll(){ sizeCanvas(starsC); sizeCanvas(fxC); buildStars(); }
   addEventListener('resize', sizeAll);
 
   /* ── star field + shooting stars ── */
@@ -568,12 +750,124 @@
     fx.globalAlpha = 1;
   }
 
-  function loop(t){ drawStars(t); drawFx(t); requestAnimationFrame(loop); }
+  /* ── comet timeline: a shooting star writes the story path as you read.
+     It rides the side margins beside each chapter and swings through the
+     centre only in the empty gaps between sections, so it never crosses
+     words or photographs. The gold path stays etched behind it. ── */
+  var comet = {x:0,y:0,px:0,py:0,idx:0,samples:[],ready:false,on:false};
+  function crPoint(p0,p1,p2,p3,t){
+    var t2=t*t,t3=t2*t;
+    return [
+      0.5*((2*p1[0])+(-p0[0]+p2[0])*t+(2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*t2+(-p0[0]+3*p1[0]-3*p2[0]+p3[0])*t3),
+      0.5*((2*p1[1])+(-p0[1]+p2[1])*t+(2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*t2+(-p0[1]+3*p1[1]-3*p2[1]+p3[1])*t3)
+    ];
+  }
+  function docTop(el){ return el.getBoundingClientRect().top + scrollY; }
+  function buildCometPath(){
+    var story = document.getElementById('story');
+    var els = [].slice.call(story.children).filter(function(el){
+      return el.tagName === 'SECTION' || el.classList.contains('const');
+    });
+    if(els.length < 3) return;
+    var cx = innerWidth/2;
+    var margin = Math.max(26, Math.min(innerWidth*0.07, (innerWidth-1060)/2+44));
+    var pts = [], side = 1;
+    pts.push([cx, docTop(els[0]) + els[0].offsetHeight*0.88]);
+    for(var i=1;i<els.length;i++){
+      var el = els[i], top = docTop(el), h = el.offsetHeight;
+      if(el.classList.contains('const')){
+        pts.push([cx, top + h/2]);
+      }else{
+        var sx2 = side>0 ? innerWidth-margin : margin;
+        pts.push([sx2, top + h*0.24]);
+        pts.push([sx2, top + h*0.76]);
+        side *= -1;
+      }
+    }
+    var lastEl = els[els.length-1];
+    pts.push([cx, docTop(lastEl) + lastEl.offsetHeight*0.92]);
+    var samples = [];
+    for(i=0;i<pts.length-1;i++){
+      var p0=pts[Math.max(0,i-1)], p1=pts[i], p2=pts[i+1], p3=pts[Math.min(pts.length-1,i+2)];
+      var steps = Math.max(10, Math.round(Math.hypot(p2[0]-p1[0],p2[1]-p1[1])/12));
+      for(var s=0;s<steps;s++){ samples.push(crPoint(p0,p1,p2,p3,s/steps)); }
+    }
+    samples.push(pts[pts.length-1]);
+    comet.samples = samples;
+    if(!comet.ready){
+      comet.idx = 0;
+      comet.x = samples[0][0]; comet.y = samples[0][1];
+    }
+    comet.ready = true;
+  }
+  addEventListener('load', buildCometPath);
+  addEventListener('resize', buildCometPath);
+  setTimeout(buildCometPath, 1200);
+  function drawComet(t){
+    if(!comet.ready || !comet.on || reduceMotion) return;
+    var S = comet.samples;
+    var target = scrollY + innerHeight*0.45;
+    while(comet.idx < S.length-1 && S[comet.idx+1][1] < target) comet.idx++;
+    while(comet.idx > 0 && S[comet.idx][1] > target) comet.idx--;
+    var tx = S[comet.idx][0], ty = S[comet.idx][1];
+    comet.px = comet.x; comet.py = comet.y;
+    comet.x += (tx-comet.x)*0.085;
+    comet.y += (ty-comet.y)*0.085;
+    var vx = comet.x-comet.px, vy = comet.y-comet.py;
+    var speed = Math.hypot(vx,vy);
+    /* etched path behind the comet, only what it has already written */
+    fx.save();
+    fx.beginPath();
+    var started = false, topEdge = scrollY-120, botEdge = scrollY+innerHeight+120;
+    for(var i=0;i<S.length;i++){
+      var p = S[i];
+      if(p[1] > comet.y) break;
+      if(p[1] < topEdge || p[1] > botEdge) { started = false; continue; }
+      var sxp = p[0], syp = p[1]-scrollY;
+      if(!started){ fx.moveTo(sxp,syp); started = true; }
+      else fx.lineTo(sxp,syp);
+    }
+    if(started) fx.lineTo(comet.x, comet.y-scrollY);
+    fx.strokeStyle = 'rgba(217,179,106,.38)';
+    fx.lineWidth = 1.2;
+    fx.shadowColor = 'rgba(217,179,106,.8)';
+    fx.shadowBlur = 6;
+    fx.stroke();
+    fx.restore();
+    /* stardust trail */
+    if(speed > 0.25){
+      var n = Math.min(3, Math.ceil(speed*0.35));
+      for(var k=0;k<n;k++){
+        parts.push({x:comet.x+(Math.random()-.5)*3, y:comet.y-scrollY+(Math.random()-.5)*3,
+          vx:-vx*0.06+(Math.random()-.5)*.5, vy:-vy*0.06+(Math.random()-.5)*.5,
+          g:0, life:0, max:26+Math.random()*22,
+          c:GOLDS[(Math.random()*GOLDS.length)|0], r:.7+Math.random()*1.5});
+      }
+    }
+    /* comet head */
+    var hx = comet.x, hy = comet.y-scrollY;
+    var glow = fx.createRadialGradient(hx,hy,0,hx,hy,16);
+    glow.addColorStop(0,'rgba(255,246,222,.95)');
+    glow.addColorStop(.25,'rgba(243,220,164,.5)');
+    glow.addColorStop(1,'rgba(243,220,164,0)');
+    fx.fillStyle = glow;
+    fx.beginPath(); fx.arc(hx,hy,16,0,6.2832); fx.fill();
+    fx.fillStyle = '#FFF6DE';
+    fx.beginPath(); fx.arc(hx,hy,2.4,0,6.2832); fx.fill();
+    if(speed > 0.4){
+      var st = fx.createLinearGradient(hx,hy,hx-vx*10,hy-vy*10);
+      st.addColorStop(0,'rgba(255,246,222,.85)'); st.addColorStop(1,'rgba(255,246,222,0)');
+      fx.strokeStyle = st; fx.lineWidth = 1.6; fx.lineCap = 'round';
+      fx.beginPath(); fx.moveTo(hx,hy); fx.lineTo(hx-vx*10,hy-vy*10); fx.stroke();
+    }
+  }
+
+  function loop(t){ drawStars(t); drawFx(t); drawComet(t); requestAnimationFrame(loop); }
 
   /* ── envelope ── */
   var veil = document.getElementById('veil'), env = document.getElementById('envelope');
   var opened = false;
-  env.addEventListener('click', function(){
+  function openEnvelope(){
     if(opened) return; opened = true;
     env.classList.add('open');
     var r = env.getBoundingClientRect();
@@ -581,40 +875,162 @@
     setTimeout(function(){
       veil.classList.add('gone');
       document.getElementById('hero').classList.add('begin');
+      buildCometPath();
+      comet.on = true;
       setTimeout(function(){ rocket(innerWidth*0.3); rocket(innerWidth*0.7); }, 700);
-    }, 1050);
-    setTimeout(function(){ veil.remove(); }, 2300);
+    }, 680);
+    setTimeout(function(){ veil.remove(); }, 1500);
+  }
+  env.addEventListener('click', openEnvelope);
+  env.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openEnvelope(); }
   });
 
-  /* ── golden thread ── */
-  var story = document.getElementById('story');
-  var svg = document.getElementById('threadSvg');
-  var path = document.getElementById('threadPath');
-  var pathLen = 0;
-  function layoutThread(){
-    var H = story.scrollHeight, W = innerWidth;
-    svg.setAttribute('width', W); svg.setAttribute('height', H);
-    svg.setAttribute('viewBox', '0 0 '+W+' '+H);
-    var cx = W/2, amp = Math.min(W*0.3, 330);
-    var d = 'M '+cx+' '+(innerHeight*0.82);
-    var y = innerHeight*0.82, seg = innerHeight*0.85, side = 1, i = 0;
-    while(y < H - innerHeight*0.35){
-      var y2 = Math.min(y+seg, H-innerHeight*0.35);
-      d += ' C '+(cx+side*amp)+' '+(y+seg*0.33)+', '+(cx-side*amp*0.6)+' '+(y2-seg*0.33)+', '+cx+' '+y2;
-      y = y2; side*=-1; i++;
+  /* ── starfall monogram: loose stars drift into "H ✦ A" above the envelope ── */
+  (function(){
+    var mono = document.createElement('canvas');
+    mono.style.cssText = 'position:absolute;inset:0;pointer-events:none;';
+    veil.appendChild(mono);
+    var mc = mono.getContext('2d');
+    function sizeMono(){
+      if(!veil.parentNode) return;
+      mono.width = innerWidth*DPR; mono.height = innerHeight*DPR;
+      mono.style.width = innerWidth+'px'; mono.style.height = innerHeight+'px';
+      mc.setTransform(DPR,0,0,DPR,0,0);
     }
-    path.setAttribute('d', d);
-    pathLen = path.getTotalLength();
-    path.style.strokeDasharray = pathLen;
-    updateThread();
-  }
-  function updateThread(){
-    if(!pathLen) return;
-    var max = story.scrollHeight - innerHeight;
-    var prog = Math.min(1, Math.max(0, scrollY / max));
-    path.style.strokeDashoffset = pathLen * (1 - prog*1.08);
-  }
-  addEventListener('scroll', updateThread, {passive:true});
+    sizeMono(); addEventListener('resize', sizeMono);
+    var Hpts = [[0,0],[0,14],[0,28],[0,42],[0,56],[40,0],[40,14],[40,28],[40,42],[40,56],[10,28],[20,28],[30,28]];
+    var Apts = [[22,0],[16.5,14],[11,28],[5.5,42],[0,56],[27.5,14],[33,28],[38.5,42],[44,56],[14,39],[30,39]];
+    var Hstrokes = [[0,1,2,3,4],[5,6,7,8,9],[10,11,12]];
+    var Astrokes = [[0,1,2,3,4],[0,5,6,7,8],[9,10]];
+    var offA = 96, totalW = offA+44;
+    var pts = [], links = [];
+    Hpts.forEach(function(p){ pts.push({lx:p[0], ly:p[1], big:false}); });
+    pts.push({lx:68, ly:28, big:true});
+    var aBase = pts.length;
+    Apts.forEach(function(p){ pts.push({lx:offA+p[0], ly:p[1], big:false}); });
+    Hstrokes.forEach(function(st){ for(var i=0;i<st.length-1;i++) links.push([st[i],st[i+1]]); });
+    Astrokes.forEach(function(st){ for(var i=0;i<st.length-1;i++) links.push([aBase+st[i],aBase+st[i+1]]); });
+    var t0 = performance.now()+450;
+    pts.forEach(function(p,i){
+      p.sx = innerWidth/2 + (Math.random()-.5)*innerWidth*.85;
+      p.sy = Math.random()*innerHeight*.34;
+      p.d = i*36;
+      p.tw = Math.random()*6.28;
+    });
+    function ease(u){ return 1-Math.pow(1-u,3); }
+    function drawMono(t){
+      if(!veil.parentNode) return;
+      mc.clearRect(0,0,innerWidth,innerHeight);
+      var er = env.getBoundingClientRect();
+      var sc = Math.min(1, innerWidth/540)* .92;
+      var ax = innerWidth/2 - totalW*sc/2;
+      var ay = Math.max(30, er.top - 66*sc - 96);
+      var lastU = reduceMotion ? 2 : (t-t0-(pts.length-1)*36)/1500;
+      var linkA = Math.max(0, Math.min(.5, (lastU-1)*1.6));
+      if(linkA > 0){
+        mc.strokeStyle = 'rgba(217,179,106,'+linkA+')';
+        mc.lineWidth = 1; mc.lineCap = 'round';
+        mc.beginPath();
+        for(var li=0; li<links.length; li++){
+          var pa = pts[links[li][0]], pb = pts[links[li][1]];
+          mc.moveTo(ax+pa.lx*sc, ay+pa.ly*sc);
+          mc.lineTo(ax+pb.lx*sc, ay+pb.ly*sc);
+        }
+        mc.stroke();
+      }
+      for(var i=0;i<pts.length;i++){
+        var p = pts[i];
+        var u = reduceMotion ? 1 : Math.max(0, Math.min(1, (t-t0-p.d)/1500));
+        var e2 = ease(u);
+        var x = p.sx + (ax+p.lx*sc - p.sx)*e2;
+        var y = p.sy + (ay+p.ly*sc - p.sy)*e2;
+        var settled = u >= 1;
+        var a = settled ? .62+.38*Math.sin(t*.003+p.tw) : .9;
+        if(p.big){
+          var g = mc.createRadialGradient(x,y,0,x,y,13);
+          g.addColorStop(0,'rgba(243,220,164,'+(.8*a)+')');
+          g.addColorStop(1,'rgba(243,220,164,0)');
+          mc.fillStyle = g;
+          mc.beginPath(); mc.arc(x,y,13,0,6.2832); mc.fill();
+          mc.strokeStyle = 'rgba(255,246,222,'+a+')';
+          mc.lineWidth = 1.1; mc.lineCap = 'round';
+          mc.beginPath();
+          mc.moveTo(x-6.5,y); mc.lineTo(x+6.5,y);
+          mc.moveTo(x,y-6.5); mc.lineTo(x,y+6.5);
+          mc.stroke();
+          mc.fillStyle = 'rgba(255,246,222,'+a+')';
+          mc.beginPath(); mc.arc(x,y,2.6,0,6.2832); mc.fill();
+        }else{
+          mc.fillStyle = 'rgba(243,220,164,'+a+')';
+          mc.beginPath(); mc.arc(x,y,1.8,0,6.2832); mc.fill();
+        }
+      }
+      requestAnimationFrame(drawMono);
+    }
+    requestAnimationFrame(drawMono);
+  })();
+
+  /* ── self-drawing constellations ── */
+  var CONSTS = {
+    bow:{path:"M95,45 L95,95 L155,70 L95,45 M215,45 L215,95 L155,70 L215,45",
+         pts:[[95,45],[95,95],[155,70,3],[215,45],[215,95]]},
+    sun:{path:"M190,70 L204,70 M181,49 L191,39 M160,40 L160,26 M139,49 L129,39 M130,70 L116,70 M139,91 L129,101 M160,100 L160,114 M181,91 L191,101",
+         circles:[[160,70,22]],
+         pts:[[204,70],[191,39],[160,26,3],[129,39],[116,70],[129,101],[160,114],[191,101]]},
+    rings:{circles:[[141,70,25],[179,70,25]],
+         pts:[[141,45],[179,45],[141,95],[179,95],[160,56,3],[160,84]]},
+    heart:{path:"M160,102 C120,70 118,44 142,44 C154,44 160,54 160,60 C160,54 166,44 178,44 C202,44 200,70 160,102",
+         pts:[[160,102,3],[142,44],[178,44],[124,62],[196,62],[160,60]]},
+    hourglass:{path:"M130,45 L190,45 L130,95 L190,95 L130,45",
+         pts:[[130,45],[190,45],[130,95],[190,95],[160,70,3]]}
+  };
+  var NS = 'http://www.w3.org/2000/svg';
+  document.querySelectorAll('.const').forEach(function(el){
+    var def = CONSTS[el.getAttribute('data-shape')];
+    if(!def) return;
+    var svg = document.createElementNS(NS,'svg');
+    svg.setAttribute('viewBox','0 0 320 140');
+    (def.circles||[]).forEach(function(c){
+      var ci = document.createElementNS(NS,'circle');
+      ci.setAttribute('cx',c[0]); ci.setAttribute('cy',c[1]); ci.setAttribute('r',c[2]);
+      ci.setAttribute('class','cl'); ci.setAttribute('pathLength','600');
+      svg.appendChild(ci);
+    });
+    if(def.path){
+      var p = document.createElementNS(NS,'path');
+      p.setAttribute('d',def.path); p.setAttribute('class','cl');
+      svg.appendChild(p);
+    }
+    def.pts.forEach(function(pt,i){
+      var s = document.createElementNS(NS,'circle');
+      s.setAttribute('cx',pt[0]); s.setAttribute('cy',pt[1]); s.setAttribute('r',pt[2]||2.1);
+      s.setAttribute('class','st');
+      s.style.transitionDelay = (i*90)+'ms';
+      s.style.animationDelay = (Math.random()*3).toFixed(2)+'s';
+      svg.appendChild(s);
+    });
+    el.appendChild(svg);
+    svg.querySelectorAll('.cl').forEach(function(l){
+      var len = l.getAttribute('pathLength') ? 600 : Math.ceil(l.getTotalLength());
+      l.style.strokeDasharray = len;
+      l.style.strokeDashoffset = reduceMotion ? 0 : len;
+    });
+    if(reduceMotion){
+      el.classList.add('draw');
+    }else{
+      new IntersectionObserver(function(es,ob){
+        es.forEach(function(e){
+          if(e.isIntersecting){ el.classList.add('draw'); ob.disconnect(); }
+        });
+      },{threshold:.5}).observe(el);
+    }
+    el.addEventListener('click',function(){
+      var r = el.getBoundingClientRect();
+      spark(r.left+r.width/2, r.top+r.height/2, 30, 3.5, 0.05);
+      el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
+    });
+  });
 
   /* ── reveals ── */
   var io = new IntersectionObserver(function(es){
@@ -622,18 +1038,14 @@
   },{threshold:.18});
   document.querySelectorAll('.rise').forEach(function(el){ io.observe(el); });
 
-  var eclipse = document.getElementById('eclipse');
-  new IntersectionObserver(function(es){
-    es.forEach(function(e){ if(e.isIntersecting){ eclipse.classList.add('in'); } });
-  },{threshold:.3}).observe(eclipse);
-
-  var eclipse2 = document.getElementById('eclipse2');
-  new IntersectionObserver(function(es){
-    es.forEach(function(e){ if(e.isIntersecting){ eclipse2.classList.add('in'); } });
-  },{threshold:.3}).observe(eclipse2);
+  document.querySelectorAll('.eclipse').forEach(function(ec){
+    new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ ec.classList.add('in'); } });
+    },{threshold:.3}).observe(ec);
+  });
 
   /* ── word-by-word vow ── */
-  var vowText = "From crayon fights to shared forevers — some people simply belong to the same constellation.";
+  var vowText = "From crayon fights to shared forevers: some people simply belong to the same constellation.";
   var vow = document.getElementById('vow');
   vowText.split(' ').forEach(function(w,i){
     var s = document.createElement('span'); s.className='w';
@@ -645,8 +1057,8 @@
     es.forEach(function(e){ if(e.isIntersecting) vow.classList.add('play'); });
   },{threshold:.6}).observe(vow);
 
-  /* ── tilt frames ── */
-  if(!reduceMotion){
+  /* ── tilt frames (desktop pointers only) ── */
+  if(!reduceMotion && finePointer){
     document.querySelectorAll('[data-tilt]').forEach(function(fr){
       fr.addEventListener('mousemove', function(ev){
         var r = fr.getBoundingClientRect();
@@ -665,21 +1077,33 @@
     var d = Math.floor(diff/86400000);
     var h = Math.floor(diff%86400000/3600000);
     var m = Math.floor(diff%3600000/60000);
+    var s = Math.floor(diff%60000/1000);
     document.getElementById('cN-d').textContent = d;
     document.getElementById('cN-h').textContent = pad(h);
     document.getElementById('cN-m').textContent = pad(m);
+    document.getElementById('cN-s').textContent = pad(s);
   }
-  tickCount(); setInterval(tickCount, 20000);
+  tickCount(); setInterval(tickCount, 1000);
 
-  /* ── cinema curtains ── */
+  /* ── cinema curtains + graceful missing-video fallback ── */
   var shell = document.getElementById('screenShell');
+  var video = document.getElementById('wishVideo');
+  var reserved = document.getElementById('reserved');
+  function showReserved(){
+    reserved.hidden = false;
+    video.style.display = 'none';
+  }
+  var src = video.querySelector('source');
+  if(src) src.addEventListener('error', showReserved);
+  video.addEventListener('error', showReserved);
   document.getElementById('curtainCta').addEventListener('click', function(){
     shell.classList.add('open');
     var r = shell.getBoundingClientRect();
     spark(r.left+r.width*0.5, r.top+20, 30, 3.6, 0.05);
     setTimeout(function(){
-      var v = document.getElementById('wishVideo');
-      if(v.play){ v.play().catch(function(){}); }
+      if(reserved.hidden && video.play){
+        video.play().catch(showReserved);
+      }
     }, 1200);
   });
 
@@ -706,7 +1130,7 @@
       if(e.isIntersecting && !finaleShown){
         finaleShown = true;
         if(!reduceMotion){
-          rocket(innerWidth*0.28); 
+          rocket(innerWidth*0.28);
           setTimeout(function(){ rocket(innerWidth*0.72); }, 500);
           setTimeout(function(){ lantern(innerWidth*0.5); }, 900);
         }
@@ -717,8 +1141,6 @@
   /* boot */
   sizeAll();
   requestAnimationFrame(loop);
-  addEventListener('load', layoutThread);
-  setTimeout(layoutThread, 800);
 })();
 </script>
 </body>
